@@ -27,3 +27,7 @@ The application will help users save, organize and track their job applications.
 ## Current status
 
 The Project is in active development
+
+## Development plan
+
+The first version will include CRUD operations for job applications.
