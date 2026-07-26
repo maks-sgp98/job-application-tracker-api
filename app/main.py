@@ -67,7 +67,7 @@ def search_application_by_company():
     company_name = input("Enter company name: ").strip().lower()
 
     if not company_name:
-        print("Company name connot be empty.")
+        print("Company name cannot be empty.")
         return
 
 
