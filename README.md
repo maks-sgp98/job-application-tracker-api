@@ -33,3 +33,12 @@ The Project is in active development.
 ## Development plan
 
 The first version will include CRUD operations for job applications.
+
+## Current functionality
+
+- Add a job application
+- Show all job applications
+- Find an application by ID
+- Update an application status
+- Delete an application
+- Search applications by company
