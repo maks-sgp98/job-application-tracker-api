@@ -1,13 +1,13 @@
 applications = []
-
+next_application_id = 1
 def show_menu():
     print("\nJob Application Tracker")
-    print("1. App application")
+    print("1. Add application")
     print("2. Show all applications")
     print("3. Find application by ID")
     print("4. Update application status")
-    print("5. Delet application")
-    print("6. Search applicationt by company")
+    print("5. Delete application")
+    print("6. Search applications by company")
     print("0. Exit")
 
 def add_application():
@@ -18,14 +18,19 @@ def add_application():
         print("Company and position cannot be empty")
         return
 
+
+    global next_application_id
+
     application = {
-        "id": len(applications) + 1,
+        "id": next_application_id,
         "company": company,
         "position": position,
         "status": "planned"
     }
 
     applications.append(application)
+    next_application_id+=1
+
     print("Application added successfully.")
 
 def show_all_applications():
@@ -60,6 +65,10 @@ def find_application_by_company(company_name):
 def search_application_by_company():
 
     company_name = input("Enter company name: ").strip().lower()
+
+    if not company_name:
+        print("Company name connot be empty.")
+        return
 
 
     result = find_application_by_company(company_name)
@@ -133,7 +142,7 @@ def update_application_status():
         return
 
     application["status"] = new_status
-    print("application status updated.")
+    print("Application status updated.")
 
 def delete_application():
     try:

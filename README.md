@@ -28,7 +28,7 @@ The application will help users save, organize and track their job applications.
 
 ## Current status
 
-The Project is in active development.
+The project is in active development.
 
 ## Development plan
 
