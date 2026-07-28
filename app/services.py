@@ -78,3 +78,10 @@ def delete_application(application_id):
 
     applications.remove(application)
     return True
+
+
+def reset_applications():
+    global next_application_id
+    
+    applications.clear()
+    next_application_id = 1
