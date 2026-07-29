@@ -1,4 +1,4 @@
-from app.services import(
+from app.services import (
     ALLOWED_STATUSES,
     UpdateStatusResult,
     add_application,

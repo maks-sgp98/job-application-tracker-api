@@ -42,3 +42,10 @@ The first version will include CRUD operations for job applications.
 - Update an application status
 - Delete an application
 - Search applications by company
+
+## Installation
+
+```bash
+python -m venv .venv
+pip install -r requirements.txt
+

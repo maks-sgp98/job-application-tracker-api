@@ -1,6 +1,6 @@
 import pytest
 
-from app.services import(
+from app.services import (
     add_application,
     get_all_applications,
     find_application_by_id,
@@ -106,7 +106,7 @@ def test_delete_application_removes_application(reset_state):
     assert applications[0] is second_application
     assert find_application_by_id(first_application.id) is None
 
-def test_delete_application_removes_application_false_when_not_found(reset_state):
+def test_delete_application_returns_false_when_not_found(reset_state):
     first_application = add_application(
         "Google",
         "Backend Developer",
@@ -166,4 +166,4 @@ def test_update_application_status_invalid_status(reset_state):
 
     assert result is UpdateStatusResult.INVALID_STATUS
     assert updated_application is None
-    assert application.status == 'planned'
+    assert application.status == "planned"
