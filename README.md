@@ -50,3 +50,20 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+## Run tests
+
+```bash
+pytest -v
+```
+
+## Test coverage
+
+```bash
+pytest --cov=app.services --cov-report=term-missing
+```
+
+The service layer currently has 100% test coverage.
+
+## Continuous integration
+
+GitHub Actions automatically runs the test suite and checks service-layer coverage on pushes and pull requests.
