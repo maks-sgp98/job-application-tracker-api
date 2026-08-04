@@ -7,7 +7,8 @@ from app.services import (
     delete_application,
     reset_applications,
     UpdateStatusResult,
-    update_application_status
+    update_application_status,
+    find_application_by_company
 )
 
 @pytest.fixture
@@ -167,3 +168,37 @@ def test_update_application_status_invalid_status(reset_state):
     assert result is UpdateStatusResult.INVALID_STATUS
     assert updated_application is None
     assert application.status == "planned"
+
+def test_find_application_by_company_returns_mathes(reset_state):
+    google = add_application(
+        "Google",
+        "Backend Developer"
+    )
+
+    google_cloud = add_application(
+        "Google Cloud",
+        "DevOps"
+    )
+
+    add_application(
+        "Amazon",
+        "Python Developer"
+    )
+
+    result = find_application_by_company("GOOGLE")
+
+    assert len(result) == 2
+    assert google in result
+    assert google_cloud in result
+
+def test_find_application_by_company_returns_emopty_list(reset_state):
+    add_application(
+        "Google",
+        "Backend Developer"
+    )
+
+    result = find_application_by_company(
+        "Microsoft"
+    )
+
+    assert result == []
