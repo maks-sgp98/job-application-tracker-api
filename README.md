@@ -67,3 +67,29 @@ The service layer currently has 100% test coverage.
 ## Continuous integration
 
 GitHub Actions automatically runs the test suite and checks service-layer coverage on pushes and pull requests.
+
+
+## Run the API
+
+```bash
+uvicorn app.api:app --reload
+```
+
+## API documentation
+
+After starting the server:
+
+- Swagger UI: `http://127.0.0.1:8000/docs`
+- ReDoc: `http://127.0.0.1:8000/redoc`
+
+## Available endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/` | API status |
+| GET | `/applications` | List applications |
+| POST | `/applications` | Create an application |
+| GET | `/applications/{id}` | Get an application |
+| PATCH | `/applications/{id}/status` | Update status |
+| DELETE | `/applications/{id}` | Delete an application |
+| GET | `/applications/search/by-company` | Search by company |
