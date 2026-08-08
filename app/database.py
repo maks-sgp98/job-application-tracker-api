@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
-DATABES_URL = "sqlite:///./job_applications.db"
+DATABAES_URL = "sqlite:///./job_applications.db"
 
 
 class Base(DeclarativeBase):
@@ -12,7 +12,7 @@ class Base(DeclarativeBase):
 
 
 engine = create_engine(
-    DATABES_URL,
+    DATABAES_URL,
     connect_args={"check_same_thread": False},
 )
 

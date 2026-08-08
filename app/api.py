@@ -1,5 +1,10 @@
-from fastapi import FastAPI, HTTPException, Query, status
+from typing import Annotated
 
+from fastapi import Depends, FastAPI, HTTPException, Query, status
+from sqlalchemy.orm import Session
+
+from app import db_models
+from app.database import Base, engine, get_db
 from app.schemas import (
     ApplicationCreate,
     ApplicationResponse,
@@ -14,16 +19,6 @@ from app.services import (
     get_all_applications,
     update_application_status,
 )
-
-from app import db_models
-from app.database import Base, engine
-
-from typing import Annotated
-
-from fastapi import Depends
-from sqlalchemy.orm import Session
-
-from app.database import get_db
 
 Base.metadata.create_all(bind=engine)
 
@@ -65,6 +60,20 @@ def create_application(
         db=db,
         company=data.company,
         position=data.position,
+    )
+
+
+@app.get(
+    "/applications/search/by-company",
+    response_model=list[ApplicationResponse],
+)
+def search_applications_by_company(
+    db: DatabaseSession,
+    company: str = Query(min_length=1),
+):
+    return find_application_by_company(
+        db,
+        company,
     )
 
 
@@ -140,17 +149,3 @@ def remove_application(
         )
 
     return None
-
-
-@app.get(
-    "/applications/search/by-company",
-    response_model=list[ApplicationResponse],
-)
-def search_applications_by_company(
-    db: DatabaseSession,
-    company: str = Query(min_length=1),
-):
-    return find_application_by_company(
-        db,
-        company,
-    )

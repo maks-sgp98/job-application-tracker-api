@@ -20,8 +20,6 @@ ALLOWED_STATUSES = {
     "rejected",
 }
 
-applications = []
-next_application_id = 1
 
 
 def add_application(
@@ -114,9 +112,3 @@ def delete_application(
 
     return True
 
-
-def reset_applications():
-    global next_application_id
-    
-    applications.clear()
-    next_application_id = 1
