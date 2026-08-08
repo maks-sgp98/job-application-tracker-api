@@ -1,10 +1,16 @@
-from app.models import JobApplication
 from enum import Enum
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.db_models import JobApplication
+
 
 class UpdateStatusResult(Enum):
     UPDATED = "updated"
     INVALID_STATUS = "invalid_status"
     APPLICATION_NOT_FOUND = "application_not_found"
+
 
 ALLOWED_STATUSES = {
     "planned",
@@ -14,74 +20,95 @@ ALLOWED_STATUSES = {
     "rejected",
 }
 
-applications = []
-next_application_id = 1
 
 
-def add_application(company, position):
-    global next_application_id
-
+def add_application(
+    db: Session,
+    company: str,
+    position: str,
+) -> JobApplication:
     application = JobApplication(
-        application_id=next_application_id,
         company=company,
-        position=position
+        position=position,
+        status="planned",
     )
 
-    applications.append(application)
-    next_application_id += 1
+    db.add(application)
+    db.commit()
+    db.refresh(application)
 
     return application
 
 
-def get_all_applications():
-    return applications
+def get_all_applications(
+    db: Session,
+) -> list[JobApplication]:
+    statement = select(JobApplication).order_by(JobApplication.id)
+
+    return list(db.scalars(statement).all())
 
 
-def find_application_by_id(application_id):
-    for application in applications:
-        if application.id == application_id:
-            return application
-
-    return None
-
-
-def find_application_by_company(company_name):
-    result = []
-
-    for application in applications:
-        if company_name.lower() in application.company.lower():
-            result.append(application)
-
-    return result
+def find_application_by_id(
+    db: Session,
+    application_id: int,
+) -> JobApplication | None:
+    return db.get(JobApplication, application_id)
 
 
-def update_application_status(application_id, new_status):
+def find_application_by_company(
+    db: Session,
+    company_name: str,
+) -> list[JobApplication]:
+    statement = (
+        select(JobApplication)
+        .where(
+            JobApplication.company.ilike(
+                f"%{company_name}%"
+            )
+        )
+        .order_by(JobApplication.id)
+    )
+
+    return list(db.scalars(statement).all())
+
+
+def update_application_status(
+    db: Session,
+    application_id: int,
+    new_status: str,
+) -> tuple[UpdateStatusResult, JobApplication | None]:
     if new_status not in ALLOWED_STATUSES:
         return UpdateStatusResult.INVALID_STATUS, None
 
-
-    application = find_application_by_id(application_id)
-
+    application = find_application_by_id(
+        db,
+        application_id,
+    )
 
     if application is None:
         return UpdateStatusResult.APPLICATION_NOT_FOUND, None
 
     application.status = new_status
 
+    db.commit()
+    db.refresh(application)
+
     return UpdateStatusResult.UPDATED, application
 
-def delete_application(application_id):
-    application = find_application_by_id(application_id)
+def delete_application(
+    db: Session,
+    application_id: int,
+) -> bool:
+    application = find_application_by_id(
+        db,
+        application_id,
+    )
 
     if application is None:
         return False
 
-    applications.remove(application)
+    db.delete(application)
+    db.commit()
+
     return True
 
-
-def reset_applications():
-    global next_application_id
-    
-    applications.clear()
-    next_application_id = 1

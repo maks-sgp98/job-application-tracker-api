@@ -93,3 +93,23 @@ After starting the server:
 | PATCH | `/applications/{id}/status` | Update status |
 | DELETE | `/applications/{id}` | Delete an application |
 | GET | `/applications/search/by-company` | Search by company |
+
+
+## Database
+
+The application currently uses SQLite through SQLAlchemy 2.0.
+
+The database file is created automatically:
+
+```text
+job_applications.db
+```
+
+Application data persists between server restarts.
+
+## Database architecture
+
+- `database.py` configures the engine and sessions.
+- `db_models.py` contains SQLAlchemy ORM models.
+- `services.py` contains database operations.
+- FastAPI injects a database session into endpoints.

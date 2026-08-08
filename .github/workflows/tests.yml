@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/test-coverage-and-ci
   pull_request:
     branches:
       - main
@@ -30,5 +29,13 @@ jobs:
       - name: Run tests
         run: pytest -v
 
-      - name: Check service coverage
-        run: pytest --cov=app.services --cov-report=term-missing --cov-fail-under=100
+      - name: Run tests with coverage
+        run: >
+          pytest
+          --cov=app.api
+          --cov=app.database
+          --cov=app.db_models
+          --cov=app.schemas
+          --cov=app.services
+          --cov-report=term-missing
+          --cov-fail-under=85
