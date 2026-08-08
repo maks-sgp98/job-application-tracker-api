@@ -15,6 +15,19 @@ from app.services import (
     update_application_status,
 )
 
+from app import db_models
+from app.database import Base, engine
+
+from typing import Annotated
+
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+
+Base.metadata.create_all(bind=engine)
+
+DatabaseSession = Annotated[Session, Depends(get_db)]
 
 app = FastAPI(
     title="Job Application Tracker API",
@@ -35,8 +48,8 @@ def read_root():
     "/applications",
     response_model=list[ApplicationResponse],
 )
-def read_applications():
-    return get_all_applications()
+def read_applications(db: DatabaseSession):
+    return get_all_applications(db)
 
 
 @app.post(
@@ -44,8 +57,12 @@ def read_applications():
     response_model=ApplicationResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_application(data: ApplicationCreate):
+def create_application(
+    data: ApplicationCreate,
+    db: DatabaseSession,
+):
     return add_application(
+        db=db,
         company=data.company,
         position=data.position,
     )
@@ -55,8 +72,14 @@ def create_application(data: ApplicationCreate):
     "/applications/{application_id}",
     response_model=ApplicationResponse,
 )
-def read_application(application_id: int):
-    application = find_application_by_id(application_id)
+def read_application(
+    application_id: int,
+    db: DatabaseSession,
+):
+    application = find_application_by_id(
+        db,
+        application_id,
+    )
 
     if application is None:
         raise HTTPException(
@@ -74,8 +97,10 @@ def read_application(application_id: int):
 def change_application_status(
     application_id: int,
     data: ApplicationStatusUpdate,
+    db: DatabaseSession,
 ):
     result, application = update_application_status(
+        db,
         application_id,
         data.status.lower(),
     )
@@ -99,8 +124,14 @@ def change_application_status(
     "/applications/{application_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def remove_application(application_id: int):
-    deleted = delete_application(application_id)
+def remove_application(
+    application_id: int,
+    db: DatabaseSession,
+):
+    deleted = delete_application(
+        db,
+        application_id,
+    )
 
     if not deleted:
         raise HTTPException(
@@ -116,6 +147,10 @@ def remove_application(application_id: int):
     response_model=list[ApplicationResponse],
 )
 def search_applications_by_company(
+    db: DatabaseSession,
     company: str = Query(min_length=1),
 ):
-    return find_application_by_company(company)
+    return find_application_by_company(
+        db,
+        company,
+    )
