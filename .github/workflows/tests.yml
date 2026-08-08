@@ -30,4 +30,12 @@ jobs:
         run: pytest -v
 
       - name: Run tests with coverage
-        run: pytest --cov=app --cov-report=term-missing --cov-fail-under=70
+        run: >
+          pytest
+          --cov=app.api
+          --cov=app.database
+          --cov=app.db_models
+          --cov=app.schemas
+          --cov=app.services
+          --cov-report=term-missing
+          --cov-fail-under=85

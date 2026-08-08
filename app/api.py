@@ -116,7 +116,7 @@ def change_application_status(
 
     if result is UpdateStatusResult.INVALID_STATUS:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Invalid application status",
         )
 
