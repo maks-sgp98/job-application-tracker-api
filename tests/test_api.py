@@ -5,17 +5,8 @@ from app.api import app
 from app.services import reset_applications
 
 
-client = TestClient(app)
 
-
-@pytest.fixture(autouse=True)
-def reset_state():
-    reset_applications()
-    yield
-    reset_applications()
-
-
-def test_read_root():
+def test_read_root(client):
     response = client.get("/")
 
     assert response.status_code == 200
@@ -25,14 +16,14 @@ def test_read_root():
     }
 
 
-def test_read_applications_returns_empty_list():
+def test_read_applications_returns_empty_list(client):
     response = client.get("/applications")
 
     assert response.status_code == 200
     assert response.json() == []
 
 
-def test_create_application():
+def test_create_application(client):
     response = client.post(
         "/applications",
         json={
@@ -50,7 +41,7 @@ def test_create_application():
     }
 
 
-def test_create_application_rejects_empty_company():
+def test_create_application_rejects_empty_company(client):
     response = client.post(
         "/applications",
         json={
@@ -62,7 +53,7 @@ def test_create_application_rejects_empty_company():
     assert response.status_code == 422
 
 
-def test_create_application_rejects_empty_position():
+def test_create_application_rejects_empty_position(client):
     response = client.post(
         "/applications",
         json={
@@ -74,7 +65,7 @@ def test_create_application_rejects_empty_position():
     assert response.status_code == 422
 
 
-def test_create_application_rejects_missing_company():
+def test_create_application_rejects_missing_company(client):
     response = client.post(
         "/applications",
         json={
@@ -85,7 +76,7 @@ def test_create_application_rejects_missing_company():
     assert response.status_code == 422
 
 
-def test_create_application_rejects_missing_position():
+def test_create_application_rejects_missing_position(client):
     response = client.post(
         "/applications",
         json={
@@ -96,7 +87,7 @@ def test_create_application_rejects_missing_position():
     assert response.status_code == 422
 
 
-def test_read_applications_returns_created_applications():
+def test_read_applications_returns_created_applications(client):
     client.post(
         "/applications",
         json={
@@ -133,7 +124,7 @@ def test_read_applications_returns_created_applications():
     }
 
 
-def test_read_application_returns_application():
+def test_read_application_returns_application(client):
     create_response = client.post(
         "/applications",
         json={
@@ -155,7 +146,7 @@ def test_read_application_returns_application():
     }
 
 
-def test_read_application_returns_404_when_not_found():
+def test_read_application_returns_404_when_not_found(client):
     response = client.get("/applications/999")
 
     assert response.status_code == 404
@@ -164,13 +155,13 @@ def test_read_application_returns_404_when_not_found():
     }
 
 
-def test_read_application_rejects_invalid_id_type():
+def test_read_application_rejects_invalid_id_type(client):
     response = client.get("/applications/abc")
 
     assert response.status_code == 422
 
 
-def test_search_applications_by_company_returns_matches():
+def test_search_applications_by_company_returns_matches(client):
     client.post(
         "/applications",
         json={
@@ -207,7 +198,7 @@ def test_search_applications_by_company_returns_matches():
     assert data[1]["company"] == "Google Cloud"
 
 
-def test_search_applications_by_company_returns_empty_list():
+def test_search_applications_by_company_returns_empty_list(client):
     client.post(
         "/applications",
         json={
@@ -225,7 +216,7 @@ def test_search_applications_by_company_returns_empty_list():
     assert response.json() == []
 
 
-def test_search_applications_by_company_rejects_empty_query():
+def test_search_applications_by_company_rejects_empty_query(client):
     response = client.get(
         "/applications/search/by-company",
         params={"company": ""},
@@ -234,13 +225,13 @@ def test_search_applications_by_company_rejects_empty_query():
     assert response.status_code == 422
 
 
-def test_search_applications_by_company_rejects_missing_query():
+def test_search_applications_by_company_rejects_missing_query(client):
     response = client.get("/applications/search/by-company")
 
     assert response.status_code == 422
 
 
-def test_update_application_status():
+def test_update_application_status(client):
     create_response = client.post(
         "/applications",
         json={
@@ -265,7 +256,7 @@ def test_update_application_status():
     }
 
 
-def test_update_application_status_is_case_insensitive():
+def test_update_application_status_is_case_insensitive(client):
     create_response = client.post(
         "/applications",
         json={
@@ -285,7 +276,7 @@ def test_update_application_status_is_case_insensitive():
     assert response.json()["status"] == "interview"
 
 
-def test_update_application_status_returns_422_for_invalid_status():
+def test_update_application_status_returns_422_for_invalid_status(client):
     create_response = client.post(
         "/applications",
         json={
@@ -312,7 +303,7 @@ def test_update_application_status_returns_422_for_invalid_status():
     assert read_response.json()["status"] == "planned"
 
 
-def test_update_application_status_returns_404_when_not_found():
+def test_update_application_status_returns_404_when_not_found(client):
     response = client.patch(
         "/applications/999/status",
         json={"status": "interview"},
@@ -324,7 +315,7 @@ def test_update_application_status_returns_404_when_not_found():
     }
 
 
-def test_update_application_status_rejects_empty_status():
+def test_update_application_status_rejects_empty_status(client):
     create_response = client.post(
         "/applications",
         json={
@@ -343,7 +334,7 @@ def test_update_application_status_rejects_empty_status():
     assert response.status_code == 422
 
 
-def test_update_application_status_rejects_missing_status():
+def test_update_application_status_rejects_missing_status(client):
     create_response = client.post(
         "/applications",
         json={
@@ -362,7 +353,7 @@ def test_update_application_status_rejects_missing_status():
     assert response.status_code == 422
 
 
-def test_delete_application():
+def test_delete_application(client):
     create_response = client.post(
         "/applications",
         json={
@@ -383,7 +374,7 @@ def test_delete_application():
     assert read_response.status_code == 404
 
 
-def test_delete_application_returns_404_when_not_found():
+def test_delete_application_returns_404_when_not_found(client):
     response = client.delete("/applications/999")
 
     assert response.status_code == 404
@@ -392,7 +383,7 @@ def test_delete_application_returns_404_when_not_found():
     }
 
 
-def test_delete_application_rejects_invalid_id_type():
+def test_delete_application_rejects_invalid_id_type(client):
     response = client.delete("/applications/abc")
 
     assert response.status_code == 422
